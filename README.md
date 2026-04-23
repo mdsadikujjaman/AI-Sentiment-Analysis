@@ -35,6 +35,7 @@ If you want to run this project locally, follow these steps:
 ```bash
 git clone [https://github.com/mdsadikujjaman/AI-Sentiment-Analysis.git](https://github.com/mdsadikujjaman/AI-Sentiment-Analysis)
 cd AI-Sentiment-Analysis
+```
 
 **2. Create and activate a virtual environment**
 ```bash
@@ -45,17 +46,21 @@ venv\Scripts\activate
 # macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
+```
 
 **3. Install dependencies**
 ```bash
 pip install django scikit-learn joblib
+```
 
 **4. Train and save the ML model**
 Before running the server, you must train the local model so it can be saved to the directory.
 ```bash
 python train_model.py
 Note: This will generate a saved_model.joblib file inside the ml_model directory.
+```
 
 **5. Start the development server**
 ```bash
 python manage.py runserver
+```
