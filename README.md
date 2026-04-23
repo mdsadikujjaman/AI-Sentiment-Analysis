@@ -1,7 +1,3 @@
 # AI-Sentiment-Analysis
-# AI-Sentiment-Analysis
-# AI-Sentiment-Analysis
-# AI-Sentiment-Analysis
-# AI-Sentiment-Analysis
-# AI-Sentiment-Analysis
-# AI-Sentiment-Analysis
+
+This is a normal project.
