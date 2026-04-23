@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Sentiment Predictor</title>
+    <style>
+        /* CSS Variables for easy color theme management */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Takes up full screen height */
+            margin: 0;
+        }
+
+        /* The main white card container */
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        p {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        /* Modern input styling */
+        textarea { 
+            width: 100%; 
+            box-sizing: border-box; /* Ensures padding doesn't break width */
+            height: 120px; 
+            padding: 15px; 
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none; /* Prevents user from stretching the box */
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); /* Glow effect */
+        }
+
+        /* Animated button */
+        button { 
+            width: 100%;
+            padding: 12px 20px; 
+            margin-top: 15px;
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer; 
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+        button:active { transform: scale(0.98); } /* Click effect */
+
+        /* Results Box Styling */
+        #result { 
+            margin-top: 25px; 
+            padding: 20px; 
+            border-radius: 8px; 
+            display: none; 
+            text-align: center;
+        }
+
+        /* Dynamic Classes applied via Javascript */
+        .positive-result {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+
+        .negative-result {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+
+        .prediction-text {
+            font-size: 28px;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .confidence-text {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>AI Sentiment Analysis</h2>
+        <p>Type a review below to let the machine learning model analyze its emotional tone.</p>
+        
+        <textarea id="userInput" placeholder="e.g., 'This product is absolutely fantastic and works perfectly!'"></textarea>
+        
+        <button onclick="makePrediction()">Analyze Sentiment</button>
+
+        <div id="result">
+            <span class="prediction-text" id="predictionText"></span>
+            <span class="confidence-text">Confidence: <span id="confidenceText"></span>%</span>
+        </div>
+    </div>
+
+    <script>
+        async function makePrediction() {
+            const text = document.getElementById('userInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            // Basic validation so we don't send empty requests
+            if (!text.trim()) {
+                alert("Please enter some text first!");
+                return;
+            }
+
+            try {
+                // Call our Django API
+                const response = await fetch(`/api/predict/?text=${encodeURIComponent(text)}`);
+                const data = await response.json();
+                
+                // Catch any server errors
+                if (data.error) {
+                    alert("Django Error: " + data.error);
+                    return;
+                }
+                
+                // 1. Update the text
+                document.getElementById('predictionText').innerText = data.prediction;
+                document.getElementById('confidenceText').innerText = data.confidence_score;
+                
+                // 2. Reset the CSS classes, then apply the correct dynamic color
+                resultDiv.className = ''; 
+                if (data.prediction.toLowerCase() === 'positive') {
+                    resultDiv.classList.add('positive-result');
+                } else {
+                    resultDiv.classList.add('negative-result');
+                }
+
+                // 3. Reveal the box
+                resultDiv.style.display = 'block';
+
+            } catch (err) {
+                alert("Something went wrong connecting to the server.");
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
